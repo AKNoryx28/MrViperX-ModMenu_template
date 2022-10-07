@@ -12,7 +12,7 @@ public class Preferences {
     private static SharedPreferences sharedPreferences;
     private static Preferences prefsInstance;
     public static Context context;
-    public static boolean loadPref, isExpanded;
+    public static boolean loadPref, isExpanded, animateColorText;
 
     private static final String LENGTH = "_length";
     private static final String DEFAULT_STRING_VALUE = "";

@@ -1,6 +1,9 @@
 //Please don't replace listeners with lambda!
 package com.whoami28.mrviperx;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -14,6 +17,7 @@ import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
@@ -30,6 +34,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.AdapterView;
@@ -66,29 +74,29 @@ public class Menu {
     //region Variable
     public static final String TAG = "Mod_Menu"; //Tag for logcat
 
-    int TEXT_COLOR = Color.parseColor("#82CAFD");
-    int TEXT_COLOR_2 = Color.parseColor("#FFFFFF");
-    int BTN_COLOR = Color.parseColor("#1C262D");
-    int MENU_BG_COLOR = Color.parseColor("#EE1C2A35"); //#AARRGGBB
-    int MENU_FEATURE_BG_COLOR = Color.parseColor("#DD141C22"); //#AARRGGBB
+    int TEXT_COLOR = Color.parseColor("#fd8845");
+    int TEXT_COLOR_2 = Color.parseColor("#ECF2F8");
+    int BTN_COLOR = Color.parseColor("#3c4137");
+    int MENU_BG_COLOR = Color.parseColor("#AA262b22"); //#AARRGGBB
+    int MENU_FEATURE_BG_COLOR = Color.parseColor("#DD262b22"); //#AARRGGBB
     int MENU_WIDTH = 290;
     int MENU_HEIGHT = 210;
     int POS_X = 0;
     int POS_Y = 100;
 
-    float MENU_CORNER = 4f;
+    float MENU_CORNER = 20f;
     int ICON_SIZE = 45; //Change both width and height of image
     float ICON_ALPHA = 0.7f; //Transparent
-    int ToggleON = Color.GREEN;
-    int ToggleOFF = Color.RED;
-    int BtnON = Color.parseColor("#1b5e20");
-    int BtnOFF = Color.parseColor("#7f0000");
-    int CategoryBG = Color.parseColor("#2F3D4C");
-    int SeekBarColor = Color.parseColor("#80CBC4");
-    int SeekBarProgressColor = Color.parseColor("#80CBC4");
-    int CheckBoxColor = Color.parseColor("#80CBC4");
-    int RadioColor = Color.parseColor("#FFFFFF");
-    String NumberTxtColor = "#41c300";
+    int BtnON = Color.parseColor("#7ce38b");
+    int BtnOFF = Color.parseColor("#FA7970");
+    int ToggleON = Color.parseColor("#653fff");
+    int ToggleOFF = Color.parseColor("#768085");
+    int CategoryBG = Color.parseColor("#21262d");
+    int SeekBarColor = Color.parseColor("#a2d2fb");
+    int SeekBarProgressColor = Color.parseColor("#a2d2fb");
+    int CheckBoxColor = Color.parseColor("#a2d2fb");
+    int RadioColor = Color.parseColor("#ecf2f8");
+    String NumberTxtColor = "#7ce38b";
     //********************************************************************//
 
     RelativeLayout mCollapsed, mRootContainer;
@@ -101,6 +109,7 @@ public class Menu {
     ScrollView scrollView;
     boolean stopChecking, overlayRequired;
     Context getContext;
+
 
     //initialize methods from the native library
     native void Init(Context context, TextView title, TextView subTitle);
@@ -128,18 +137,24 @@ public class Menu {
         mCollapsed.setVisibility(View.VISIBLE);
         mCollapsed.setAlpha(ICON_ALPHA);
 
+        // Rotate Animation
+        RotateAnimation rotate = new RotateAnimation(0, 180, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        rotate.setRepeatCount(-1);
+        rotate.setDuration(5000);
+        rotate.setInterpolator(new LinearInterpolator());
+
         //********** The box of the mod menu **********
         mExpanded = new LinearLayout(context); // Menu markup (when the menu is expanded)
         mExpanded.setVisibility(View.GONE);
         mExpanded.setBackgroundColor(MENU_BG_COLOR);
         mExpanded.setOrientation(LinearLayout.VERTICAL);
-        // mExpanded.setPadding(1, 1, 1, 1); //So borders would be visible
+        mExpanded.setPadding(1, 1, 1, 1); //So borders would be visible
         mExpanded.setLayoutParams(new LinearLayout.LayoutParams(dp(MENU_WIDTH), WRAP_CONTENT));
         GradientDrawable gdMenuBody = new GradientDrawable();
         gdMenuBody.setCornerRadius(MENU_CORNER); //Set corner
         gdMenuBody.setColor(MENU_BG_COLOR); //Set background color
         gdMenuBody.setStroke(1, Color.parseColor("#32cb00")); //Set border
-        //mExpanded.setBackground(gdMenuBody); //Apply GradientDrawable to it
+        mExpanded.setBackground(gdMenuBody); //Apply GradientDrawable to it
 
         //********** The icon to open mod menu **********
         startImage = new ImageView(context);
@@ -161,6 +176,8 @@ public class Menu {
             }
         });
 
+
+
         //********** The icon in Webview to open mod menu **********
         WebView wView = new WebView(context); //Icon size width=\"50\" height=\"50\"
         wView.setLayoutParams(new RelativeLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
@@ -181,9 +198,10 @@ public class Menu {
         //********** Settings icon **********
         TextView settings = new TextView(context); //Android 5 can't show ⚙, instead show other icon instead
         settings.setText(Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M ? "⚙" : "\uD83D\uDD27");
-        settings.setTextColor(TEXT_COLOR);
+        settings.setTextColor(Color.DKGRAY);
         settings.setTypeface(Typeface.DEFAULT_BOLD);
-        settings.setTextSize(20.0f);
+        settings.startAnimation(rotate);
+        settings.setTextSize(28.0f);
         RelativeLayout.LayoutParams rlsettings = new RelativeLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
         rlsettings.addRule(ALIGN_PARENT_RIGHT);
         settings.setLayoutParams(rlsettings);
@@ -203,6 +221,7 @@ public class Menu {
                         scrollView.addView(mods);
                     }
                 } catch (IllegalStateException e) {
+                    Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -224,6 +243,7 @@ public class Menu {
         RelativeLayout.LayoutParams rl = new RelativeLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
         rl.addRule(RelativeLayout.CENTER_HORIZONTAL);
         title.setLayoutParams(rl);
+
 
         //********** Sub title **********
         TextView subTitle = new TextView(context);
@@ -249,18 +269,29 @@ public class Menu {
 
         //********** RelativeLayout for buttons **********
         RelativeLayout relativeLayout = new RelativeLayout(context);
-        relativeLayout.setPadding(10, 3, 10, 3);
+        relativeLayout.setPadding(3, 3, 3, 3);
         relativeLayout.setVerticalGravity(Gravity.CENTER);
+        float[] btnRadiusL = new float[]{0, 0, MENU_CORNER, MENU_CORNER, 0, 0, MENU_CORNER, MENU_CORNER};
+        float[] btnRadiusR = new float[]{MENU_CORNER, MENU_CORNER, 0, 0, MENU_CORNER, MENU_CORNER, 0, 0};
 
         //**********  Hide/Kill button **********
         RelativeLayout.LayoutParams lParamsHideBtn = new RelativeLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
         lParamsHideBtn.addRule(ALIGN_PARENT_LEFT);
 
+
         Button hideBtn = new Button(context);
         hideBtn.setLayoutParams(lParamsHideBtn);
-        hideBtn.setBackgroundColor(Color.TRANSPARENT);
-        hideBtn.setText("HIDE/KILL (Hold)");
+        hideBtn.setBackgroundColor(Color.parseColor("#0D1117"));
+        hideBtn.setText("HIDE/KILL");
         hideBtn.setTextColor(TEXT_COLOR);
+        hideBtn.setPadding(4,0, 4,0);
+
+        GradientDrawable hkBody = new GradientDrawable();
+        hkBody.setCornerRadii(btnRadiusL);
+        hkBody.setColor(MENU_BG_COLOR); //Set background color
+        hkBody.setStroke(1, Color.parseColor("#32cb00")); //Set border
+        hideBtn.setBackground(hkBody); //Apply GradientDrawable to it
+
         hideBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 mCollapsed.setVisibility(View.VISIBLE);
@@ -284,9 +315,17 @@ public class Menu {
 
         Button closeBtn = new Button(context);
         closeBtn.setLayoutParams(lParamsCloseBtn);
-        closeBtn.setBackgroundColor(Color.TRANSPARENT);
+        closeBtn.setBackgroundColor(Color.parseColor("#0D1117"));
         closeBtn.setText("MINIMIZE");
         closeBtn.setTextColor(TEXT_COLOR);
+        closeBtn.setPadding(4,0,4, 0);
+
+        GradientDrawable hBody = new GradientDrawable();
+        hBody.setCornerRadii(btnRadiusR); //Set corner
+        hBody.setColor(MENU_BG_COLOR); //Set background color
+        hBody.setStroke(1, Color.parseColor("#32cb00")); //Set border
+        closeBtn.setBackground(hBody); //Apply GradientDrawable to it
+
         closeBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 mCollapsed.setVisibility(View.VISIBLE);
@@ -294,6 +333,29 @@ public class Menu {
                 mExpanded.setVisibility(View.GONE);
             }
         });
+
+        // Color Animation
+        ValueAnimator colorAnim = ValueAnimator.ofFloat(0, 1);
+        colorAnim.setDuration(2000);
+        colorAnim.setRepeatCount(Animation.INFINITE);
+        float[] hsv;
+        final int[] runColor = new int[1];
+        hsv = new float[3]; // Transition color
+        hsv[1] = 1;
+        hsv[2] = 1;
+        colorAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                hsv[0] = 360 * animation.getAnimatedFraction();
+                runColor[0] = Color.HSVToColor(hsv);
+
+                title.setTextColor(runColor[0]);
+                hideBtn.setTextColor(runColor[0]);
+                closeBtn.setTextColor(runColor[0]);
+                subTitle.setTextColor(runColor[0]);
+            }
+        });
+        colorAnim.start();
 
         //********** Adding view components **********
         mRootContainer.addView(mCollapsed);

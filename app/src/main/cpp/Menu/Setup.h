@@ -109,11 +109,11 @@ void CheckOverlayPermission(JNIEnv *env, jclass thiz, jobject ctx){
 
 void Init(JNIEnv *env, jobject thiz, jobject ctx, jobject title, jobject subtitle){
     //Set sub title
-    setText(env, title, OBFUSCATE("<b>Modded by Whoami28</b>"));
+    setText(env, title, OBFUSCATE("<b>MOD MENU</b>"));
 
     //Set sub title
     setText(env, subtitle, OBFUSCATE("<b><marquee><p style=\"font-size:30\">"
-                                     "<p style=\"color:green;\">Modded by Whoami28</p> | "
+                                     "<p style=\"color:green;\">Modded by Askan</p> | "
                                      "https://github.com/AKNoryx28 | Hacking is The Game | (void*)nullptr </p>"
                                      "</marquee></b>"));
 
@@ -121,7 +121,7 @@ void Init(JNIEnv *env, jobject thiz, jobject ctx, jobject title, jobject subtitl
     //setDialog(ctx,env,OBFUSCATE("Title"),OBFUSCATE("Message Example"));
 
     //Toast Example
-    Toast(env,ctx,OBFUSCATE("Modded by Whoami28"),ToastLength::LENGTH_SHORT);
+    //Toast(env,ctx,OBFUSCATE("Modded by Whoami28"),ToastLength::LENGTH_SHORT);
 
     initValid = true;
 }
